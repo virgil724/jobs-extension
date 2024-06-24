@@ -1,59 +1,103 @@
-// Select elements
-const titleElement = document.querySelector("#app > div > div.mobile > div.jobmobile-header.mb-3 > div.bg-white.p-4 > h1");
-const jobTitle = titleElement ? titleElement.childNodes[0].textContent.trim() : '';
-
-const pay = document.querySelector("#app > div > div.mobile > div.jobmobile-header.mb-3 > div.bg-white.p-4 > div > div.col.flex-1.text-primary.h3 > span.align-baseline")?.innerHTML;
-const addr = document.querySelector("#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(3) > div.col.p-0.list-row__data > div > div > span:nth-child(1)")?.innerHTML;
-
-const children = document.querySelector("#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(1) > div.col.p-0.list-row__data > div > div")?.children;
-const workCata = [];
-
-if (children) {
-    for (let i = 0; i < children.length; i++) {
-        const uElement = children[i].querySelector('u');
-        if (uElement) {
-            workCata.push(uElement.innerHTML);
-        }
-    }
+interface WorkDetail {
+    jobTitle: string;
+    pay: string;
+    addr: string;
+    workType: string;
+    workCata: string[];
+    jd: string;
+    reqs: Record<string, string>;
 }
 
-const workType = document.querySelector("#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(2) > div.col.p-0.list-row__data > div")?.innerHTML;
-const jd = document.querySelector("#app > div > div.mobile > div:nth-child(4) > div:nth-child(2) > div.job-description-table.row > div.job-description.col-12 > p")?.innerHTML;
+interface Selectors {
+    jobTitle: string;
+    pay: string;
+    addr: string;
+    workCata: string;
+    workType: string;
+    jd: string;
+    reqs: string;
+}
 
-// Select the container that holds the job requirements
-const container = document.querySelector("#app > div > div.mobile > div.dialog.container-fluid.bg-white.rounded.dialog-mobile.py-4.mb-3.job-requirement");
+// Function to extract text content from an element
+function getTextContent(selector: string): string {
+    const element = document.querySelector(selector);
+    return element ? element.textContent?.trim() || '' : '';
+}
 
-// Initialize an empty object to hold the requirements
-const reqs = {};
+// Function to extract work categories
+function extractWorkCategories(selector: string): string[] {
+    const container = document.querySelector(selector);
+    if (!container) return [];
+    
+    return Array.from(container.querySelectorAll('u'))
+        .map(el => el.textContent?.trim() || '')
+        .filter(text => text);
+}
 
-// Function to extract text from an element
-const extractText = element => element ? element.textContent.trim() : '';
+// Function to extract requirements
+function extractRequirements(containerSelector: string): Record<string, string> {
+    const container = document.querySelector(containerSelector);
+    if (!container) return {};
 
-// Extract each requirement with shorter English short names
-reqs['exp'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(1) .col.p-0.list-row__data div'));
-reqs['edu'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(2) .col.p-0.list-row__data div'));
-reqs['maj'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(3) .col.p-0.list-row__data div'));
-reqs['lang'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(4) .col.p-0.list-row__data div p'));
-reqs['tool'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(5) .col.p-0.list-row__data div'));
-reqs['skl'] = extractText(container.querySelector('div.job-requirement-table > div:nth-child(6) .col.p-0.list-row__data div'));
-reqs['oth'] = extractText(container.querySelector('.job-requirement.col.is-ellipsis .list-row__data .job-requirement-table__maxheight p'));
+    const reqs: Record<string, string> = {};
+    const rows = container.querySelectorAll('.list-row.row');
+    
+    rows.forEach(row => {
+        const head = row.querySelector('.list-row__head h3');
+        const data = row.querySelector('.list-row__data .t3');
+        if (head && data) {
+            const key = head.textContent?.trim() || '';
+            const value = data.textContent?.trim() || '';
+            reqs[key] = value;
+        }
+    });
 
-// Compile the work detail object
-const workDetail = {
-    jobTitle,
-    pay,
-    addr,
-    workType,
-    workCata,
-    jd,
-    reqs
+    // Extract "其他條件" separately as it has a different structure
+    const otherReqs = container.querySelector('.job-requirement.col.opened .job-requirement-table__data p');
+    if (otherReqs) {
+        reqs['其他條件'] = otherReqs.textContent?.trim() || '';
+    }
+
+    return reqs;
+}
+
+let selectors: Selectors;
+
+if (window.innerWidth < 1024) {
+    selectors = {
+        jobTitle: "#app > div > div.mobile > div.jobmobile-header.mb-3 > div.bg-white.p-4 > h1",
+        pay: "#app > div > div.mobile > div.jobmobile-header.mb-3 > div.bg-white.p-4 > div > div.col.flex-1.text-primary.h3 > span.align-baseline",
+        addr: "#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(3) > div.col.p-0.list-row__data > div > div > span:nth-child(1)",
+        workCata: "#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(1) > div.col.p-0.list-row__data > div > div",
+        workType: "#app > div > div.mobile > div:nth-child(4) > div:nth-child(1) > div > div:nth-child(2) > div.col.p-0.list-row__data > div",
+        jd: "#app > div > div.mobile > div:nth-child(4) > div:nth-child(2) > div.job-description-table.row > div.job-description.col-12 > p",
+        reqs: ".dialog.container-fluid.bg-white.rounded.dialog-mobile.py-4.mb-3.job-requirement"
+    };
+} else {
+    selectors = {
+        jobTitle: 'h1[data-v-704cbba1]',
+        pay: '.list-row__data .t3.mb-0 .text-primary.font-weight-bold',
+        addr: '.job-address span',
+        workCata: '.category-item',
+        workType: '.list-row__data .t3.mb-0',
+        jd: '.job-description__content',
+        reqs: '.dialog.container-fluid.bg-white.rounded.mb-4.pt-6.pb-6.job-requirement'
+    };
+}
+
+const workDetail: WorkDetail = {
+    jobTitle: getTextContent(selectors.jobTitle),
+    pay: getTextContent(selectors.pay),
+    addr: getTextContent(selectors.addr),
+    workType: getTextContent(selectors.workType),
+    workCata: extractWorkCategories(selectors.workCata),
+    jd: getTextContent(selectors.jd),
+    reqs: extractRequirements(selectors.reqs)
 };
 
-// Log the work detail object
-console.log(workDetail);
-
+// Assuming chrome.runtime.sendMessage is available in your environment
+// If not, you might need to add type definitions for it
 chrome.runtime.sendMessage({
-    type: "104",
-
+    type: "saveData",
     workDetail
-})
+});
