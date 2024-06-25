@@ -67,6 +67,10 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
 
       chrome.storage.session.set({ tabData: tabData }, function () {
         console.log(`Data for tab ${tabId} removed`);
+
+        chrome.runtime.sendMessage({ type: "updateJob" })
+
+
       });
     }
   });
