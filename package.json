@@ -36,6 +36,7 @@
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.19",
     "@types/chrome": "^0.0.246",
+    "@types/leaflet": "^1.9.12",
     "@types/node": "^20.14.4",
     "@vitejs/plugin-vue": "^4.4.0",
     "autoprefixer": "^10.4.19",
