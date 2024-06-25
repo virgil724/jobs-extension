@@ -26,9 +26,10 @@
 import { TableBody, Table, TableRow, TableCell, TableHead, TableHeader } from './ui/table';
 import { Button } from './ui/button';
 import { Trash2, Locate } from 'lucide-vue-next';
-const jobs = defineModel('jobs')
+import { NWorkDetail } from './Map.vue';
+const jobs = defineModel('jobs', { type: Array<NWorkDetail>, required: true })
 const emit = defineEmits(['set-center'])
-function removeJobById(jobId) {
+function removeJobById(jobId: number) {
   jobs.value = jobs.value.filter(job => job.tabId !== jobId);
   chrome.tabs.remove(jobId)
 }

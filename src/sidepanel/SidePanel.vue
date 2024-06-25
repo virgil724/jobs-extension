@@ -5,14 +5,19 @@ import { Tabs, TabsContent, TabsTrigger, TabsList } from '@/components/ui/tabs';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 
 import { ref, onMounted } from 'vue'
-import Map from '@/components/Map.vue';
+import Map, { NWorkDetail } from '@/components/Map.vue';
 import WorkTable from '@/components/WorkTable.vue';
+import { WorkDetail } from '@/contentScript/104';
 const countSync = ref(0)
 const link = ref('https://github.com/guocaoyi/create-chrome-ext')
-const jobs = ref([])
+const jobs = ref<Array<NWorkDetail>>([])
 const tabs = ref("job-list")
-const center = ref(undefined)
-function convertToTabArray(tabData) {
+const center = ref<Coords | undefined>(undefined)
+interface DWorkDetail {
+  [key: number]: WorkDetail
+
+}
+function convertToTabArray(tabData: DWorkDetail): Array<NWorkDetail> {
   return Object.entries(tabData).map(([tabId, data]) => ({
     tabId: parseInt(tabId, 10),  // Convert tabId to integer
     ...data
@@ -24,9 +29,9 @@ const updateJobs = () => {
     jobs.value = convertToTabArray(tabData)
   })
 }
-chrome.runtime.onMessage.addListener((request)=>{
-  
-  if (request.type==='updateJob'){
+chrome.runtime.onMessage.addListener((request) => {
+
+  if (request.type === 'updateJob') {
     console.log("getUpdate")
     updateJobs()
   }

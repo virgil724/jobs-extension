@@ -5,11 +5,11 @@ import "leaflet/dist/leaflet.css";
 
 import { ref, defineProps, onMounted, onUnmounted, watch, computed } from 'vue'
 import { WorkDetail } from "@/contentScript/104";
-interface NWorkDetail extends WorkDetail {
+export interface NWorkDetail extends WorkDetail {
   tabId: number
   coords: { lat: number, lng: number }
 }
-const jobs = defineModel('jobs', { type: Array < NWorkDetail >, required: true })
+const jobs = defineModel('jobs', { type: Array<NWorkDetail>, required: true })
 const { center } = defineProps(['center'])
 const computeCenter = computed(() => {
   if (center) {
@@ -30,7 +30,7 @@ const computeCenter = computed(() => {
     }
   }
 })
-const markers = ref < L.Marker > ([]);
+const markers = ref<Array<L.Marker>>([]);
 
 function handlePopupButtonClick(jobId: number) {
   chrome.tabs.update(jobId, { active: true })
@@ -45,7 +45,7 @@ const createMarker = (job: NWorkDetail) => {
     <b>${job.jobTitle}</b><br>${job.addr}<br>
     <button id="popupButton_${job.tabId}">Select Job</button>
   `;
-
+  // @ts-ignore
   L.DomEvent.on(popupContent.querySelector(`#popupButton_${job.tabId}`), 'click', () => {
     handlePopupButtonClick(job.tabId);
   });
@@ -55,12 +55,14 @@ const createMarker = (job: NWorkDetail) => {
   return marker;
 };
 
-const updateMarkers = (newJobs: NWorkDetail, oldJobs: NWorkDetail) => {
+const updateMarkers = (newJobs: Array<NWorkDetail>, oldJobs: Array<NWorkDetail>) => {
   // Remove old markers
+  console.log(oldJobs)
   oldJobs.forEach((oldJob) => {
     if (!newJobs.some(newJob => newJob.tabId === oldJob.tabId)) {
-      const marker = markers.value.find(marker => marker.getLatLng().lat === oldJob.lat && marker.getLatLng().lng === oldJob.lng);
+      const marker = markers.value.find(marker => marker.getLatLng().lat === oldJob.coords.lat && marker.getLatLng().lng === oldJob.coords.lng);
       if (marker) {
+        //@ts-ignore
         map.removeLayer(marker);
         markers.value = markers.value.filter(m => m !== marker);
       }
@@ -69,7 +71,7 @@ const updateMarkers = (newJobs: NWorkDetail, oldJobs: NWorkDetail) => {
 
   // Add new markers
   newJobs.forEach((newJob) => {
-    if (!oldJobs.some(oldJob => oldJob.id === newJob.id)) {
+    if (!oldJobs.some(oldJob => oldJob.tabId === newJob.tabId)) {
       const marker = createMarker(newJob);
       markers.value.push(marker);
     }
