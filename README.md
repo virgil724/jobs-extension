@@ -51,10 +51,11 @@ Welcome to the 104 Job Location Chrome Extension repository! This extension is d
 #### Screenshots
 
 **Real-time Location Display**
-![Real-time Location Display](mnt/data/螢幕擷取畫面 2024-06-26 003641.png)
+![螢幕擷取畫面 2024-06-25 204632](https://github.com/virgil724/jobs-extension/assets/108603174/f3ffc18b-7bbb-47b4-a955-6857cce91d9d)
 
 **Job Bookmarking and Management**
-![Job Bookmarking and Management](mnt/data/image.png)
+![image](https://github.com/virgil724/jobs-extension/assets/108603174/a960e6ee-6f2f-4c47-9c5a-021179f24de1)
+
 
 #### Development
 
