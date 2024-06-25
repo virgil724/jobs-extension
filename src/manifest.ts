@@ -16,8 +16,9 @@ export default defineManifest({
     128: 'img/logo-128.png',
   },
   action: {
-    default_popup: 'popup.html',
+
     default_icon: 'img/logo-48.png',
+
   },
   options_page: 'options.html',
   devtools_page: 'devtools.html',
@@ -26,15 +27,15 @@ export default defineManifest({
     type: 'module',
   },
   content_scripts: [
-    {
-      matches: ['http://*/*', 'https://*/*'],
-      js: ['src/contentScript/index.ts'],
-    },
+    // {
+    //   matches: ['http://*/*', 'https://*/*'],
+    //   js: ['src/contentScript/index.ts'],
+    // },
     {
       matches: [
         "https://www.104.com.tw/job/*"
       ],
-      js:['src/contentScript/104.ts']
+      js: ['src/contentScript/104.ts']
 
     }
   ],
