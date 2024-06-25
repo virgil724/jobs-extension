@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet/dist/images/marker-shadow.png";
+import "leaflet/dist/images/marker-icon.png";
 
 
 import { ref, defineProps, onMounted, onUnmounted, watch, computed } from 'vue'
@@ -19,6 +21,8 @@ const computeCenter = computed(() => {
     if (jobs.value.length === 0) {
       return { lat: 0, lng: 0 } // Default center if no jobs
     }
+    // 有時候ContentScript 會抓不到東西 造成這邊job.coords.lat undefined
+    // 問題未知
 
     const sumLat = jobs.value.reduce((sum, job) => sum + job.coords.lat, 0)
     const sumLng = jobs.value.reduce((sum, job) => sum + job.coords.lng, 0)
