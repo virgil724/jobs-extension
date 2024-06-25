@@ -82,6 +82,16 @@ If you want to contribute to the development of this extension, follow these ste
 5. **Create a Pull Request**:
     - Open a pull request to the main repository, describing the changes you have made.
 
+#### Future Development
+
+We have exciting plans to expand the functionality of the 104 Job Location Chrome Extension. Here's a sneak peek at what you can expect in future updates:
+
+- **Support for Yourator**: We aim to extend the extension's capabilities to include job listings from Yourator, providing real-time location display and bookmarking features similar to those available for 104人力銀行.
+  
+- **Support for CakeResume**: Integration with CakeResume is also on our roadmap. This will enable users to see the geographical locations of job postings on CakeResume, enhancing the job search experience across multiple platforms.
+
+Stay tuned for these updates and more as we continue to improve and expand the extension to better meet your job search needs.
+
 #### License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
