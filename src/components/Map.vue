@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet/dist/images/marker-shadow.png";
-import "leaflet/dist/images/marker-icon.png";
+
+// https://cescobaz.com/2023/06/14/setup-leaflet-with-svelte-and-vite/
+import markerIconUrl from "leaflet/dist/images/marker-icon.png";
+import markerIconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowUrl from "leaflet/dist/images/marker-shadow.png";
 
 
 import { ref, defineProps, onMounted, onUnmounted, watch, computed } from 'vue'
@@ -95,6 +98,10 @@ onMounted(() => {
     attribution: "© OpenStreetMap",
   }).addTo(map);
   setTimeout(() => map.invalidateSize(), 100)
+  L.Icon.Default.prototype.options.iconUrl = markerIconUrl;
+  L.Icon.Default.prototype.options.iconRetinaUrl = markerIconRetinaUrl;
+  L.Icon.Default.prototype.options.shadowUrl = markerShadowUrl;
+  L.Icon.Default.imagePath = ""; // necessary to avoid Leaflet adds some prefix to image path.
   // Initialize markers
   if (jobs.value) {
     jobs.value.forEach(job => {
