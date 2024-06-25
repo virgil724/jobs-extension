@@ -10,7 +10,7 @@
     <TableBody>
       <TableRow v-for="job in jobs" :key="job.tabId">
         <TableCell>{{ job.jobTitle }}</TableCell>
-        <TableCell><Button size=icon>
+        <TableCell><Button @click="$emit('set-center', job.tabId, job.coords)" size=icon>
             <Locate />
           </Button></TableCell>
         <TableCell><Button size=icon @click="removeJobById(job.tabId)">
@@ -27,8 +27,10 @@ import { TableBody, Table, TableRow, TableCell, TableHead, TableHeader } from '.
 import { Button } from './ui/button';
 import { Trash2, Locate } from 'lucide-vue-next';
 const jobs = defineModel('jobs')
+const emit = defineEmits(['set-center'])
 function removeJobById(jobId) {
   jobs.value = jobs.value.filter(job => job.tabId !== jobId);
+  chrome.tabs.remove(jobId)
 }
 
 </script>
