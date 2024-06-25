@@ -1,4 +1,4 @@
-interface WorkDetail {
+export interface WorkDetail {
     type: string;
     coords: { lat: number; lng: number } | null;
     urlPath: string;
@@ -103,7 +103,7 @@ const workDetail: WorkDetail = {
     jd: getTextContent(selectors.jd),
     reqs: extractRequirements(selectors.reqs)
 };
-chrome.runtime.sendMessage({ type: 'geocode', addr:workDetail.addr }, function (response) {
+chrome.runtime.sendMessage({ type: 'geocode', addr: workDetail.addr }, function (response) {
     if (response.coords) {
         workDetail.coords = response.coords;
     } else {
@@ -112,8 +112,12 @@ chrome.runtime.sendMessage({ type: 'geocode', addr:workDetail.addr }, function (
     chrome.runtime.sendMessage({
         type: "saveData",
         workDetail
+    }, function () {
+        chrome.runtime.sendMessage({ type: "updateJob" })
+
     });
 })
+
 
 console.log(workDetail)
 

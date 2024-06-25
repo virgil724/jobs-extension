@@ -10,7 +10,8 @@ import WorkTable from '@/components/WorkTable.vue';
 const countSync = ref(0)
 const link = ref('https://github.com/guocaoyi/create-chrome-ext')
 const jobs = ref([])
-
+const tabs = ref("job-list")
+const center = ref(undefined)
 function convertToTabArray(tabData) {
   return Object.entries(tabData).map(([tabId, data]) => ({
     tabId: parseInt(tabId, 10),  // Convert tabId to integer
@@ -23,6 +24,14 @@ const updateJobs = () => {
     jobs.value = convertToTabArray(tabData)
   })
 }
+chrome.runtime.onMessage.addListener((request)=>{
+  
+  if (request.type==='updateJob'){
+    console.log("getUpdate")
+    updateJobs()
+  }
+})
+
 onMounted(() => {
   chrome.storage.sync.get(['count'], (result) => {
     countSync.value = result.count ?? 0
@@ -38,14 +47,21 @@ onMounted(() => {
   })
 })
 
+interface Coords {
+  lat: number;
+  lng: number;
+}
 
-
+const setCenter = (tabId: number, coords: Coords): void => {
+  chrome.tabs.update(tabId, { active: true })
+  center.value = coords;
+  tabs.value = 'map';
+}
 </script>
 
 <template>
   <main>
-    {{ jobs }}
-    <Tabs default-value="job-list" class="w-[100%]">
+    <Tabs default-value="job-list" v-model="tabs" class="w-[100%]">
       <TabsList class="grid w-full grid-cols-2">
         <TabsTrigger value="job-list">
           工作列表
@@ -58,7 +74,7 @@ onMounted(() => {
       <TabsContent value="map">
         <Card>
           <CardContent :style="{ height: '90vh', padding: '5px' }">
-            <Map v-model:jobs="jobs"></Map>
+            <Map v-model:jobs="jobs" :center></Map>
           </CardContent>
         </Card>
       </TabsContent>
@@ -69,7 +85,7 @@ onMounted(() => {
             <CardTitle>工作列表</CardTitle>
           </CardHeader>
           <CardContent class="space-y-2">
-            <WorkTable v-model:jobs='jobs'></WorkTable>
+            <WorkTable v-model:jobs="jobs" @set-center="setCenter"></WorkTable>
           </CardContent>
 
         </Card>
