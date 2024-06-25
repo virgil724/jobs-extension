@@ -8,12 +8,12 @@
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow v-for="job in jobs" :key="job.id">
-        <TableCell>{{ job.name }}</TableCell>
+      <TableRow v-for="job in jobs" :key="job.tabId">
+        <TableCell>{{ job.jobTitle }}</TableCell>
         <TableCell><Button size=icon>
             <Locate />
           </Button></TableCell>
-        <TableCell><Button size=icon @click="removeJobById(job.id)">
+        <TableCell><Button size=icon @click="removeJobById(job.tabId)">
             <Trash2 />
           </Button></TableCell>
       </TableRow>
@@ -28,7 +28,7 @@ import { Button } from './ui/button';
 import { Trash2, Locate } from 'lucide-vue-next';
 const jobs = defineModel('jobs')
 function removeJobById(jobId) {
-  jobs.value = jobs.value.filter(job => job.id !== jobId);
+  jobs.value = jobs.value.filter(job => job.tabId !== jobId);
 }
 
 </script>
