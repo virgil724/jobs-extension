@@ -1,4 +1,7 @@
 interface WorkDetail {
+    type: string;
+    coords: { lat: number; lng: number } | null;
+    urlPath: string;
     jobTitle: string;
     pay: string;
     addr: string;
@@ -28,7 +31,7 @@ function getTextContent(selector: string): string {
 function extractWorkCategories(selector: string): string[] {
     const container = document.querySelector(selector);
     if (!container) return [];
-    
+
     return Array.from(container.querySelectorAll('u'))
         .map(el => el.textContent?.trim() || '')
         .filter(text => text);
@@ -41,7 +44,7 @@ function extractRequirements(containerSelector: string): Record<string, string> 
 
     const reqs: Record<string, string> = {};
     const rows = container.querySelectorAll('.list-row.row');
-    
+
     rows.forEach(row => {
         const head = row.querySelector('.list-row__head h3');
         const data = row.querySelector('.list-row__data .t3');
@@ -62,7 +65,7 @@ function extractRequirements(containerSelector: string): Record<string, string> 
 }
 
 let selectors: Selectors;
-
+// TODO: jobTitle 會多東西 XX/XX更新 全職...
 if (window.innerWidth < 1024) {
     selectors = {
         jobTitle: "#app > div > div.mobile > div.jobmobile-header.mb-3 > div.bg-white.p-4 > h1",
@@ -79,13 +82,19 @@ if (window.innerWidth < 1024) {
         pay: '.list-row__data .t3.mb-0 .text-primary.font-weight-bold',
         addr: '.job-address span',
         workCata: '.category-item',
-        workType: '.list-row__data .t3.mb-0',
+        workType: '.job-description-table > div:nth-child(4) > .list-row__data',
         jd: '.job-description__content',
         reqs: '.dialog.container-fluid.bg-white.rounded.mb-4.pt-6.pb-6.job-requirement'
     };
 }
 
+
+
+
 const workDetail: WorkDetail = {
+    type: '104',
+    urlPath: window.location.pathname,
+    coords: null,
     jobTitle: getTextContent(selectors.jobTitle),
     pay: getTextContent(selectors.pay),
     addr: getTextContent(selectors.addr),
@@ -94,10 +103,20 @@ const workDetail: WorkDetail = {
     jd: getTextContent(selectors.jd),
     reqs: extractRequirements(selectors.reqs)
 };
+chrome.runtime.sendMessage({ type: 'geocode', addr:workDetail.addr }, function (response) {
+    if (response.coords) {
+        workDetail.coords = response.coords;
+    } else {
+        console.error('Geocoding error:', response.error);
+    }
+    chrome.runtime.sendMessage({
+        type: "saveData",
+        workDetail
+    });
+})
+
+console.log(workDetail)
+
 
 // Assuming chrome.runtime.sendMessage is available in your environment
 // If not, you might need to add type definitions for it
-chrome.runtime.sendMessage({
-    type: "saveData",
-    workDetail
-});
